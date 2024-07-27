@@ -65,8 +65,8 @@ require('dotenv').config();
         newPage.on("framenavigated", async () => {
           const currentUrl = await newPage.url();
 
-          // Sayfanın tam olarak yüklenmesini bekle
-          await newPage.waitForNavigation({ waitUntil: "networkidle0" });
+          // // Sayfanın tam olarak yüklenmesini bekle
+          // await newPage.waitForNavigation({ waitUntil: "domcontentloaded" });
 
           if (currentUrl === previousUrl) {
             console.log("URL değişmedi. İşlem yapılmıyor.");
@@ -265,13 +265,23 @@ require('dotenv').config();
               counterQuestion = await newPage.evaluate(async () => { return document.querySelector("span[aria-label*='Question']").textContent });
               console.log("Yeni Counter: ", counterQuestion);
 
+
+              const generateRandomId = () => {
+                return Math.random().toString(36).substr(2, 9);
+              };
+              
+              const randomId = generateRandomId();
+              await newPage.screenshot({ path: `screenshoot_${randomId}_${counterQuestion.replace('/','-')}.png` });
+
+
               //EĞER BOŞLUK DOLDURMAYSA ÇÖZ.
               console.log("Blank işlemiyse yap.");
               let isFillBlankQuestion = await newPage.evaluate(async () => {
                 function delay(ms) {return new Promise(resolve => setTimeout(resolve, ms));}
 
-                const textContent = document.body.innerText || document.body.textContent;
-                var result = /fill/i.test(textContent) && /blank/i.test(textContent);
+                let textContent = document.body.innerText || document.body.textContent;
+                textContent = textContent.toLowerCase();
+                var result = /fill in the blank/i.test(textContent)  && /blank/i.test(textContent) && /drag/i.test(textContent) ;
 
                 if (result)
                 {
@@ -303,15 +313,16 @@ require('dotenv').config();
               {
                 console.log("Blank değil, normal soru devam ediyorum.");
                 //Butonların yüklenmesini bekle.
-                await newPage.waitForFunction(() => document.querySelectorAll("button[data-testid*='multiple-choice-answer']").length == 4);
+                await newPage.waitForFunction(() => document.querySelectorAll("button[data-testid*='multiple-choice-answer']").length >= 3);
                 console.log("Tüm butonlar yüklendi.");
 
                 //SORUYU AL
                 let question = await newPage.evaluate(() => {
                   return `
                         Sana tüm sayfadaki metni veriyorum. Burda en başta bir soru ondan sonrada 4 şık var ve şıkların ıd'si var.
-                        Senden istediğim şu; soruyu çöz ve doğru olan cevabın id'sini döndür başka hiçbir şey döndürme!
-                  
+                        Senden istediğim şu; aşağıdaki formata uygun şeklinde cevaba ait id'nin sondaki numarasını aşağıdaki "(id)" kısmına yaz. Başka ekstra hiçbir şey ekleme.
+                        Cevap formatı: multiple-choice-answer-(id)
+
                         Tüm sayfa metni:
                         ${document.querySelector("main").textContent}
                         Cevap şıkları:
@@ -358,6 +369,9 @@ require('dotenv').config();
                   return answerChatGPT;
                 }, question);
 
+                answer = answer.trim().replace(' ','');
+
+
                 // CEVABI İŞARETLE
                 console.log("Cevabı işaretliyorum. cevap: ", answer);
                 newPage.bringToFront();
@@ -380,6 +394,13 @@ require('dotenv').config();
               await newPage.waitForFunction(() => document.querySelector("button[data-testid*='quiz-button-cta']").disabled == false);
               await newPage.click('button[data-testid*="quiz-button-cta"]');
 
+              
+              let counterSplited = counterQuestion.replace(' ','').split('/');
+              if (counterSplited[0] === counterSplited[1]){
+                console.log("son soru olduğu algılandı, durduruluyor...");
+                isStarted = false;
+              }
+              
             }
           }
         });
