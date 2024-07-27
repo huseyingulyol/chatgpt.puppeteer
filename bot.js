@@ -1,4 +1,5 @@
 const puppeteer = require("puppeteer");
+require('dotenv').config();
 
 (async () => {
   // Tarayıcıyı başlat
@@ -26,7 +27,7 @@ const puppeteer = require("puppeteer");
 
   await pagePercipio.waitForSelector("input#loginName");
   await pagePercipio.click("input#loginName");
-  await pagePercipio.type("input#loginName", "berkan.bilgin.dev@gmail.com");
+  await pagePercipio.type("input#loginName", process.env.USERNAME);
 
   await pagePercipio.waitForSelector(
     "button.Button---root---2BQqW.Button---primary---1O3lq.Button---small---3PMLN.Button---center---13Oaw"
@@ -36,7 +37,7 @@ const puppeteer = require("puppeteer");
   );
 
   await pagePercipio.waitForSelector('input[type="password"]');
-  await pagePercipio.type('input[type="password"]', "your-password");
+  await pagePercipio.type('input[type="password"]', process.env.PASSWORD);
 
   await pagePercipio.waitForSelector(
     'button.Button---root---2BQqW.Button---primary---1O3lq.Button---small---3PMLN.Button---center---13Oaw[type="submit"]'
