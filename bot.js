@@ -54,6 +54,7 @@ require('dotenv').config();
 
   let previousUrl = ""; // Önceki URL'yi saklamak için bir değişken
   let isStarted = false;
+  let counterQuestion = "";
 
   browser.on("targetcreated", async (target) => {
     if (target.type() === "page") {
@@ -80,183 +81,193 @@ require('dotenv').config();
             console.log(message); // Tarayıcı konsoluna yazdır
           }, `Dostum sayfa değişti: ${currentUrl}`);
 
-          // if (currentUrl.includes("/exercises/")) {
-          //   isStarted = await newPage.evaluate(() => {
-          //     //@@@@@@@@@@@@@@@@@@@@@@@@@BROWSER_CONTEXT@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+          if (currentUrl.includes("/exercises/")) {
+            isStarted = await newPage.evaluate(() => {
+              //@@@@@@@@@@@@@@@@@@@@@@@@@BROWSER_CONTEXT@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-          //     let isStartExerciseSolver = false;
+              let isStartExerciseSolver = false;
 
-          //     function delay(ms) {return new Promise(resolve => setTimeout(resolve, ms));}
+              function delay(ms) {return new Promise(resolve => setTimeout(resolve, ms));}
 
-          //     async function checkElement(querySelectorText)
-          //     {
+              async function checkElement(querySelectorText)
+              {
 
-          //         try {
-          //             var element = document.querySelector(querySelectorText)
-          //             if (element == null)
-          //             {
-          //               return false;
-          //             }
-          //             else
-          //             {
-          //               if (element.ariaDisabled == null )
-          //               {
-          //                 if (element.disabled == undefined)
-          //                 {
-          //                   return true;
-          //                 }
-          //                 else
-          //                 {
-          //                   if (element.disabled == false) return true; // button aktif
-          //                   else return false;
-          //                 }
+                  try {
+                      var element = document.querySelector(querySelectorText)
+                      if (element == null)
+                      {
+                        return false;
+                      }
+                      else
+                      {
+                        if (element.ariaDisabled == null )
+                        {
+                          if (element.disabled == undefined)
+                          {
+                            return true;
+                          }
+                          else
+                          {
+                            if (element.disabled == false) return true; // button aktif
+                            else return false;
+                          }
 
-          //               }
-          //               else
-          //               {
-          //                 if (element.disabled == false && element.ariaDisabled == 'false') return true; // aktifse
-          //                 else return false;
-          //               }
-          //             }
-          //         }
-          //         catch (error) {
-          //             return false; // Hata durumunda boş string döndür
-          //         }
-          //     }
+                        }
+                        else
+                        {
+                          if (element.disabled == false && element.ariaDisabled == 'false') return true; // aktifse
+                          else return false;
+                        }
+                      }
+                  }
+                  catch (error) {
+                      return false; // Hata durumunda boş string döndür
+                  }
+              }
 
-          //     async function checkElementAndClick(querySelectorText)
-          //     {
-          //       while (!(await checkElement(querySelectorText))){
-          //         console.log("bekleniyor: "  + querySelectorText);
-          //         await delay(100);
-          //       }
-          //       await delay(100);
-          //       document.querySelector(querySelectorText).click()
-          //       console.log("bitti: " + querySelectorText);
-          //     }
+              async function checkElementAndClick(querySelectorText)
+              {
+                while (!(await checkElement(querySelectorText))){
+                  console.log("bekleniyor: "  + querySelectorText);
+                  await delay(100);
+                }
+                await delay(100);
+                document.querySelector(querySelectorText).click()
+                console.log("bitti: " + querySelectorText);
+              }
 
-          //     async function checkButtonTextsAndClick(text) {
-          //       while (isStartExerciseSolver)
-          //       {
-          //         console.log("bekleniyorV2: " + text);
-          //         const buttons = document.querySelectorAll('button');
+              async function checkButtonTextsAndClick(text) {
+                while (isStartExerciseSolver)
+                {
+                  console.log("bekleniyorV2: " + text);
+                  const buttons = document.querySelectorAll('button');
 
-          //         for (const button of buttons) {
-          //             if (button.textContent.includes(text)) {
-          //                 button.click();
-          //                 await delay(500);
-          //                 return;
-          //             }
-          //         }
-          //         await delay(200);
-          //       }
-          //       console.log("bittiV2: " + text);
-          //     }
+                  for (const button of buttons) {
+                      if (button.textContent.includes(text)) {
+                          button.click();
+                          await delay(500);
+                          return;
+                      }
+                  }
+                  await delay(200);
+                }
+                console.log("bittiV2: " + text);
+              }
 
-          //     async function checkElementsText(text) {
+              async function checkElementsText(text) {
 
-          //         console.log("bekleniyorV2: " + text);
-          //         const buttons = document.querySelectorAll('button');
+                  console.log("bekleniyorV2: " + text);
+                  const buttons = document.querySelectorAll('button');
 
-          //         for (const button of buttons) {
-          //             if (button.textContent.includes(text)) {
-          //                 return true;
-          //             }
-          //         }
-          //         await delay(200);
+                  for (const button of buttons) {
+                      if (button.textContent.includes(text)) {
+                          return true;
+                      }
+                  }
+                  await delay(200);
 
-          //       console.log("bittiV2: " + text);
+                console.log("bittiV2: " + text);
 
-          //     }
+              }
 
-          //     async function loop()
-          //     {
-          //       while(isStartExerciseSolver)
-          //       {
+              async function loop()
+              {
+                while(isStartExerciseSolver)
+                {
 
-          //         while ((await checkElement('button[id*="discovery-next"]')))
-          //         {
-          //           if (await checkElementsText("Up Next"))
-          //           {
-          //             await checkElementAndClick('button[id*="discovery-next"]');
-          //             return isStartExerciseSolver;
-          //           }
-          //           else
-          //           {
-          //             console.log("ilerledim.");
-          //             await checkElementAndClick('button[id*="discovery-next"]');
-          //             await delay(1000);
-          //           }
+                  while ((await checkElement('button[id*="discovery-next"]')))
+                  {
+                    if (await checkElementsText("Up Next"))
+                    {
+                      await checkElementAndClick('button[id*="discovery-next"]');
+                      return isStartExerciseSolver;
+                    }
+                    else
+                    {
+                      console.log("ilerledim.");
+                      await checkElementAndClick('button[id*="discovery-next"]');
+                      await delay(1000);
+                    }
 
-          //         }
+                  }
 
-          //         await checkElementAndClick('button[data-testid*="run-button"]');
-          //         await delay(300);
-          //         await checkElementAndClick('button[data-testid*="run-button"]');
-          //         await delay(300);
-          //         await checkElementAndClick('button[data-testid*="view-solution-button"]');
-          //         await delay(300);
-          //         await checkButtonTextsAndClick("Replace");
-          //         await delay(300);
-          //       }
+                  await checkElementAndClick('button[data-testid*="run-button"]');
+                  await delay(300);
+                  await checkElementAndClick('button[data-testid*="run-button"]');
+                  await delay(300);
+                  await checkElementAndClick('button[data-testid*="view-solution-button"]');
+                  await delay(300);
+                  await checkButtonTextsAndClick("Replace");
+                  await delay(300);
+                }
 
-          //     }
+              }
 
-          //     async function StartExerciseSolver() {
-          //       isStartExerciseSolver = true;
-          //       await loop();
-          //     }
+              async function StartExerciseSolver() {
+                isStartExerciseSolver = true;
+                await loop();
+              }
 
-          //     async function StopExerciseSolver() {
-          //       isStartExerciseSolver = false;
-          //     }
+              async function StopExerciseSolver() {
+                isStartExerciseSolver = false;
+              }
 
-          //     const button = document.createElement('button');
-          //     button.id = 'dynamic-start-button'; // Butona id atayarak kontrolü kolaylaştır
-          //     button.textContent = 'START EXERCISE SOLVER';
-          //     button.style.position = 'fixed';
-          //     button.style.bottom = '20px';
-          //     button.style.right = '20px';
-          //     button.style.padding = '10px 20px';
-          //     button.style.backgroundColor = 'green'; // Buton rengi
-          //     button.style.color = 'white';
-          //     button.style.border = 'none';
-          //     button.style.borderRadius = '5px';
-          //     button.style.cursor = 'pointer';
-          //     button.style.zIndex = '1000'; // Diğer öğelerin üstünde görünsün
-          //     document.body.appendChild(button);
+              const button = document.createElement('button');
+              button.id = 'dynamic-start-button'; // Butona id atayarak kontrolü kolaylaştır
+              button.textContent = 'START EXERCISE SOLVER';
+              button.style.position = 'fixed';
+              button.style.bottom = '20px';
+              button.style.right = '20px';
+              button.style.padding = '10px 20px';
+              button.style.backgroundColor = 'green'; // Buton rengi
+              button.style.color = 'white';
+              button.style.border = 'none';
+              button.style.borderRadius = '5px';
+              button.style.cursor = 'pointer';
+              button.style.zIndex = '1000'; // Diğer öğelerin üstünde görünsün
+              document.body.appendChild(button);
 
-          //     button.addEventListener('click', async () => {
-          //       if (!isStartExerciseSolver)
-          //       {
-          //         button.style.backgroundColor = "red";
-          //         button.textContent = "STOP EXERCISE SOLVER";
-          //         await StartExerciseSolver();
+              button.addEventListener('click', async () => {
+                if (!isStartExerciseSolver)
+                {
+                  button.style.backgroundColor = "red";
+                  button.textContent = "STOP EXERCISE SOLVER";
+                  await StartExerciseSolver();
 
-          //       }
-          //       else
-          //       {
-          //         button.style.backgroundColor = "green";
-          //         button.textContent = "START EXERCISE SOLVER";
-          //         await StopExerciseSolver();
-          //       }
-          //     });
-          //   //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-          //   });
-          // }
+                }
+                else
+                {
+                  button.style.backgroundColor = "green";
+                  button.textContent = "START EXERCISE SOLVER";
+                  await StopExerciseSolver();
+                }
+              });
+            //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+            });
+          }
 
-          isStarted = true;
 
           if (currentUrl.includes("/quizzes/")) 
           {
+            isStarted = true;
   
             while (isStarted) 
             {
 
+              console.log("Counter bekleniyor... Şuanki Counter:", counterQuestion);
+              await newPage.waitForSelector("span[aria-label*='Question'");
+              
+              console.log("Counter bulundu, farklı olması bekleniyor...");
+
+              await newPage.waitForFunction((exceptedValue) => document.querySelector("span[aria-label*='Question']").textContent != exceptedValue,{}, counterQuestion);
+
+              console.log("Counter farklı, devam ediyorum.");
+              counterQuestion = await newPage.evaluate(async () => { return document.querySelector("span[aria-label*='Question']").textContent });
+              console.log("Yeni Counter: ", counterQuestion);
+
               //EĞER BOŞLUK DOLDURMAYSA ÇÖZ.
               console.log("Blank işlemiyse yap.");
               let isFillBlankQuestion = await newPage.evaluate(async () => {
-
                 function delay(ms) {return new Promise(resolve => setTimeout(resolve, ms));}
 
                 const textContent = document.body.innerText || document.body.textContent;
@@ -290,7 +301,7 @@ require('dotenv').config();
               console.log("Blank mi?");
               if (!isFillBlankQuestion)
               {
-                console.log("Blank değil, normal soru muamelisine başladım.");
+                console.log("Blank değil, normal soru devam ediyorum.");
                 //Butonların yüklenmesini bekle.
                 await newPage.waitForFunction(() => document.querySelectorAll("button[data-testid*='multiple-choice-answer']").length == 4);
                 console.log("Tüm butonlar yüklendi.");
@@ -320,35 +331,31 @@ require('dotenv').config();
                 //CEVABI ÖĞREN
                 pageChatGPT.bringToFront();
                 let answer = await pageChatGPT.evaluate(async (message) => {
-                  //@@@@@@@@@@@@@@@@@@@@@@@@@PAGE_CHATGPT_BROWSER_CONTEXT@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-                  function delay(ms) {
-                    return new Promise((resolve) => setTimeout(resolve, ms));
-                  }
 
-                  async function GetAnswer() {
-                    await delay(1000);
-                    const input = document.querySelector('textarea[id*="prompt-textarea"]');
-                    input.focus();
-                    const event = new Event("input", { bubbles: true });
-                    input.value = message;
-                    input.dispatchEvent(event);
-                    await delay(500);
+                  function delay(ms) {return new Promise((resolve) => setTimeout(resolve, ms));}
 
-                    document.querySelector("button[data-testid*='send-button']").click();
-                    await delay(2000);
+                  await delay(1000);
 
-                    let answerChatGPT = document.querySelectorAll("div[data-message-author-role='assistant']")
-                    [document.querySelectorAll("div[data-message-author-role='assistant']").length - 1].textContent;
+                  const input = document.querySelector('textarea[id*="prompt-textarea"]');
+                  input.focus();
+                  const event = new Event("input", { bubbles: true });
+                  input.value = message;
+                  input.dispatchEvent(event);
 
-                    await delay(500);
-                    console.log(answerChatGPT);
+                  await delay(500);
 
-                    return answerChatGPT;
-                  }
+                  document.querySelector("button[data-testid*='send-button']").click();
 
-                  await GetAnswer();
+                  await delay(2000);
 
-                  //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                  let answerChatGPT = document.querySelectorAll("div[data-message-author-role='assistant']")
+                  [document.querySelectorAll("div[data-message-author-role='assistant']").length - 1].textContent;
+
+                  await delay(500);
+
+                  console.log(answerChatGPT);
+
+                  return answerChatGPT;
                 }, question);
 
                 // CEVABI İŞARETLE
@@ -358,11 +365,21 @@ require('dotenv').config();
                 
 
               }
+              else
+              {
+                // CHECKANSWER'E TIKLA
+                console.log("Check answere'e basıyorum.");
 
-              // NEXT TUŞUNA BAS
+                await newPage.waitForFunction(() => document.querySelector("button[data-testid*='quiz-button-cta']").disabled == false);
+                await newPage.click('button[data-testid*="quiz-button-cta"]');
+              }
+
+              // NEXT TUŞUNA TIKLA
               console.log("Next'e basıyorum.");
-              await newPage.waitForTimeout(500);
+
+              await newPage.waitForFunction(() => document.querySelector("button[data-testid*='quiz-button-cta']").disabled == false);
               await newPage.click('button[data-testid*="quiz-button-cta"]');
+
             }
           }
         });
