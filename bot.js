@@ -395,7 +395,7 @@ require('dotenv').config();
               await newPage.click('button[data-testid*="quiz-button-cta"]');
 
               
-              let counterSplited = counterQuestion.replace(' ','').split('/');
+              let counterSplited = counterQuestion.replaceAll(' ','').split('/');
               if (counterSplited[0] === counterSplited[1]){
                 console.log("son soru olduğu algılandı, durduruluyor...");
                 isStarted = false;
