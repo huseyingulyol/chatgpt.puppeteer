@@ -253,6 +253,12 @@ require('dotenv').config();
   
             while (isStarted) 
             {
+              let counterSplited = counterQuestion.replaceAll(' ','').split('/');
+              if (counterSplited[0] === counterSplited[1]){
+                console.log("son soru olduğu algılandı, durduruluyor...");
+                isStarted = false;
+                break;
+              }
 
               console.log("Counter bekleniyor... Şuanki Counter:", counterQuestion);
               await newPage.waitForSelector("span[aria-label*='Question'");
@@ -394,12 +400,7 @@ require('dotenv').config();
               await newPage.waitForFunction(() => document.querySelector("button[data-testid*='quiz-button-cta']").disabled == false);
               await newPage.click('button[data-testid*="quiz-button-cta"]');
 
-              
-              let counterSplited = counterQuestion.replaceAll(' ','').split('/');
-              if (counterSplited[0] === counterSplited[1]){
-                console.log("son soru olduğu algılandı, durduruluyor...");
-                isStarted = false;
-              }
+             
               
             }
           }
