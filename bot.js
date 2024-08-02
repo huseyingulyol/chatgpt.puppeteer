@@ -272,12 +272,12 @@ require('dotenv').config();
               console.log("Yeni Counter: ", counterQuestion);
 
 
-              const generateRandomId = () => {
-                return Math.random().toString(36).substr(2, 9);
-              };
+              // const generateRandomId = () => {
+              //   return Math.random().toString(36).substr(2, 9);
+              // };
               
-              const randomId = generateRandomId();
-              await newPage.screenshot({ path: `screenshoot_${randomId}_${counterQuestion.replace('/','-')}.png` });
+              // const randomId = generateRandomId();
+              // await newPage.screenshot({ path: `screenshoot_${randomId}_${counterQuestion.replace('/','-')}.png` });
 
 
               //EĞER BOŞLUK DOLDURMAYSA ÇÖZ.
@@ -345,9 +345,9 @@ require('dotenv').config();
                     `;
                 });
               
-                //CEVABI ÖĞREN
+                //CEVABI ÖĞREN (CHATGPT)
                 pageChatGPT.bringToFront();
-                let answer = await pageChatGPT.evaluate(async (message) => {
+                await pageChatGPT.evaluate(async (message) => {
 
                   function delay(ms) {return new Promise((resolve) => setTimeout(resolve, ms));}
 
@@ -362,18 +362,21 @@ require('dotenv').config();
                   await delay(500);
 
                   document.querySelector("button[data-testid*='send-button']").click();
+                }, question);
 
-                  await delay(2000);
+                // Yazmaya başlamasını bekle.
+                await pageChatGPT.waitForFunction(() => document.querySelector(".result-streaming") != null); 
+                // Yazmayı bitirmesini bekle.
+                await pageChatGPT.waitForFunction(() => document.querySelector(".result-streaming") == null); 
 
+                let answer = await pageChatGPT.evaluate(async (message) => {
+                  
+                  //Son mesajı al.
                   let answerChatGPT = document.querySelectorAll("div[data-message-author-role='assistant']")
                   [document.querySelectorAll("div[data-message-author-role='assistant']").length - 1].textContent;
-
-                  await delay(500);
-
-                  console.log(answerChatGPT);
-
                   return answerChatGPT;
-                }, question);
+
+                });
 
                 answer = answer.trim().replace(' ','');
 
@@ -399,9 +402,6 @@ require('dotenv').config();
 
               await newPage.waitForFunction(() => document.querySelector("button[data-testid*='quiz-button-cta']").disabled == false);
               await newPage.click('button[data-testid*="quiz-button-cta"]');
-
-             
-              
             }
           }
         });
